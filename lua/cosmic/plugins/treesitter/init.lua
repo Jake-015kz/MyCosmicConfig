@@ -3,24 +3,8 @@ local u = require('cosmic.utils')
 
 local defaults = {
   ensure_installed = {
-    'astro',
-    'css',
-    'go',
-    'html',
-    'javascript',
-    'jsdoc',
-    'json',
-    'lua',
-    'markdown',
-    'markdown_inline',
-    'php',
-    'python',
-    'regex',
-    'styled',
-    'scss',
-    'tsx',
-    'typescript',
-    'yaml',
+    'astro', 'css', 'html', 'javascript', 'json', 'lua',
+    'markdown', 'markdown_inline', 'scss', 'typescript', 'tsx', 'yaml',
   },
   highlight = {
     enable = true,
@@ -36,10 +20,7 @@ local defaults = {
     enable = true,
     enable_autocmd = false,
   },
-  refactor = {
-    highlight_definitions = { enable = true },
-    highlight_current_scope = { enable = false },
-  },
+  -- УДАЛИЛИ БЛОК REFACTOR ОТСЮДА
 }
 
 return {
@@ -47,12 +28,19 @@ return {
   dependencies = {
     'windwp/nvim-ts-autotag',
     'JoosepAlviste/nvim-ts-context-commentstring',
-    'nvim-treesitter/nvim-treesitter-refactor',
+    -- УДАЛИЛИ 'nvim-treesitter/nvim-treesitter-refactor' ОТСЮДА
   },
   event = 'BufEnter',
   build = ':TSUpdate',
   config = function()
-    require('nvim-treesitter.configs').setup(u.merge(defaults, user_config.plugins.treesitter or {}))
+    -- Используем новый способ вызова, если старый не найден
+    local ok, configs = pcall(require, "nvim-treesitter.configs")
+    if ok then
+      configs.setup(u.merge(defaults, user_config.plugins.treesitter or {}))
+    else
+      -- Если не нашли configs, пробуем запустить напрямую через основной модуль
+      require("nvim-treesitter").setup(u.merge(defaults, user_config.plugins.treesitter or {}))
+    end
   end,
   enabled = not vim.tbl_contains(user_config.disable_builtin_plugins, 'treesitter'),
 }
